@@ -1,0 +1,10 @@
+/* import dos modulos por dominio ... variáveis -> reset -> layout -> componentes -> utilitários */
+@import url("base/variables.css");
+@import url("base/reset.css");
+@import url("layout/shell.css");
+@import url("layout/toolbar.css");
+@import url("components/alerts.css");
+@import url("components/kpi.css");
+@import url("components/search.css");
+@import url("components/table.css");
+@import url("utilities/code.css");

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ month_key }} · OPO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div class="top-brand">
+        <div class="top-brand__logo-wrap">
+          {% if logo_url %}
+            <img class="brand-logo" src="{{ logo_url }}" alt="Logo MaiaEmCarneiro" width="220" height="88" loading="lazy" />
+          {% else %}
+            <div class="brand-logo brand-logo--placeholder" aria-hidden="true"></div>
+          {% endif %}
+        </div>
+        <div class="top-brand__text">
+          <p class="top-brand__project">MaiaEmCarneiro</p>
+          <p class="top-brand__tagline">Francisco Sá Carneiro · OPO</p>
+        </div>
+      </div>
+    </header>
+
+    {% if parse_warnings %}
+      {% for w in parse_warnings %}
+        <div class="alert alert--warn" role="status">{{ w }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if fetch_error %}
+      <div class="alert alert--error" role="alert">
+        <strong>Ligação à base de dados</strong> — {{ fetch_error }}
+      </div>
+    {% endif %}
+
+    <div class="toolbar">
+      <div class="nav-month">
+        {% if prev_m %}
+          <a class="nav-btn" href="{{ url_for('dashboard.index', m=prev_m) }}" aria-label="Mês anterior">‹</a>
+        {% else %}
+          <button class="nav-btn" type="button" disabled aria-disabled="true">‹</button>
+        {% endif %}
+        <span class="month-title">{{ month_label }}</span>
+        {% if next_m %}
+          <a class="nav-btn" href="{{ url_for('dashboard.index', m=next_m) }}" aria-label="Mês seguinte">›</a>
+        {% else %}
+          <button class="nav-btn" type="button" disabled aria-disabled="true">›</button>
+        {% endif %}
+      </div>
+      <label>
+        <span class="field-label">Saltar para</span>
+        <select class="month-select" id="month-jump" aria-label="Escolher mês">
+          {% for mk in month_choices %}
+            <option value="{{ mk }}" {% if mk == month_key %}selected{% endif %}>{{ mk }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <section class="kpis" aria-label="Resumo do mês">
+      <div class="kpi kpi--green">
+        <div class="kpi-label">Total mensal (BD)</div>
+        <div class="kpi-value">
+          {% if month_total_stored is not none %}{{ month_total_stored }}{% else %}—{% endif %}
+        </div>
+        <div class="kpi-sub">Linha <code class="code-faint">month</code> · {% if month_row and month_row.updated_at %}atual. {{ month_row.updated_at[:16] }}{% else %}sem registo{% endif %}</div>
+      </div>
+      <div class="kpi kpi--accent">
+        <div class="kpi-label">Soma dias (com dados)</div>
+        <div class="kpi-value">{{ sum_days }}</div>
+        <div class="kpi-sub">Apenas dias com linha <code class="code-faint">day</code></div>
+      </div>
+      <div class="kpi kpi-wide">
+        <div class="kpi-label">Dias listados</div>
+        <div class="kpi-value">{{ cells|length }}</div>
+        <div class="kpi-sub">Até hoje · sem datas futuras</div>
+      </div>
+    </section>
+
+    {% if mismatch %}
+      <div class="alert alert--warn" role="status">
+        O total <code>month</code> na BD ({{ month_total_stored }}) não coincide com a soma dos dias ({{ sum_days }}). O worker pode ainda não ter recalculado.
+      </div>
+    {% endif %}
+
+    {% if not fetch_error and not has_any_day_data %}
+      <div class="alert" role="status">
+        <strong>Sem dados diários</strong> neste mês na tabela. Corre o worker (<code>--once</code>) ou espera pela próxima sincronização.
+      </div>
+    {% endif %}
+
+    <div class="search-wrap">
+      <input type="search" class="search" id="row-filter" placeholder="Filtrar por dia, semana ou número…" autocomplete="off" />
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Dia</th>
+              <th></th>
+              <th class="th-num">Voos</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="day-body">
+            {% for c in cells %}
+              <tr
+                data-search="{{ c.day.strftime('%d') }} {{ c.day.strftime('%d/%m') }} {{ c.weekday_short }} {{ c.flights or '' }}"
+                {% if c.has_db_row and c.flights is not none %}data-has="1"{% endif %}
+              >
+                <td class="col-day">{{ c.day.strftime('%d/%m') }}</td>
+                <td class="col-wd">{{ c.weekday_short }}</td>
+                <td class="col-num {% if not c.has_db_row %}col-num--empty{% endif %}">
+                  {% if c.has_db_row and c.flights is not none %}{{ c.flights }}{% else %}—{% endif %}
+                </td>
+                <td>
+                  {% if c.has_db_row %}
+                    <span class="pill pill--ok">Registo</span>
+                  {% else %}
+                    <span class="pill pill--no">Sem dados</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="footer">Local · só leitura · {{ month_key }}</p>
+  </div>
+
+  <script>
+    (function () {
+      var sel = document.getElementById("month-jump");
+      if (sel) {
+        sel.addEventListener("change", function () {
+          var v = sel.value;
+          if (v) window.location.search = "m=" + encodeURIComponent(v);
+        });
+      }
+      var input = document.getElementById("row-filter");
+      var body = document.getElementById("day-body");
+      if (!input || !body) return;
+      input.addEventListener("input", function () {
+        var q = (input.value || "").trim().toLowerCase();
+        var rows = body.querySelectorAll("tr");
+        rows.forEach(function (tr) {
+          var hay = (tr.getAttribute("data-search") || "").toLowerCase();
+          tr.setAttribute("data-hidden", q && hay.indexOf(q) === -1 ? "1" : "0");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+requests
+supabase
+python-dotenv
+apscheduler
+python-dateutil
+tzdata
+flask

@@ -1,0 +1,18 @@
+:root {
+  --bg0: #0f1419;
+  --bg1: #151d26;
+  --surface: rgba(32, 44, 58, 0.72);
+  --surface2: rgba(22, 32, 44, 0.9);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e9eef5;
+  --muted: #8fa3b5;
+  --accent: #1e3a5f;
+  --accent2: #0d2137;
+  --green: #16402d;
+  --greenHi: #1f5a3f;
+  --warn: #c9a227;
+  --danger: #c45c5c;
+  --glow: rgba(46, 139, 87, 0.25);
+  --radius: 16px;
+  --font: "DM Sans", system-ui, -apple-system, sans-serif;
+}

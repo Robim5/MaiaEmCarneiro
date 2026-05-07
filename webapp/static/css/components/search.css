@@ -1,0 +1,25 @@
+.search-wrap {
+  margin-bottom: 0.75rem;
+}
+
+.search {
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.search::placeholder {
+  color: var(--muted);
+}
+
+.search:focus {
+  outline: none;
+  border-color: rgba(46, 139, 87, 0.55);
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.15);
+}
