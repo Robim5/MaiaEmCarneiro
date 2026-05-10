@@ -131,9 +131,8 @@ def cleanup_old_rows(supabase: Client, today: date) -> None:
         cutoff_month,
     )
 
-
 def delete_all_rollups(supabase: Client) -> None:
-    """Apaga todas as linhas da tabela (reset manual)."""
+    """ apaga todas as linhas da tabela (reset manual) """
     # PostgREST exige um filtro no delete; id >= 1 cobre linhas normais com identity.
     supabase.table(TABLE_NAME).delete().gte("id", 1).execute()
     logging.warning("Tabela %s foi esvaziada (reset).", TABLE_NAME)
