@@ -66,7 +66,7 @@ Copia o `.env.example` para `.env` e preenche com os teus valores reais.
 - **AIRLABS_API_KEY** -> chave da conta Airlabs.  
 - **AIRPORT_IATA** -> por defeito `OPO`.  
 - **WORKER_TIMEZONE** -> por defeito `Europe/Lisbon` (o “hoje” do job segue este fuso).  
-- **SCHEDULE_TIMES** -> horas em que o job corre, por defeito `12:00,23:50`.  
+- **SCHEDULE_TIMES** -> horas em que o job corre, por defeito `06:00,18:00` (6 da manhã e 6 da tarde, hora de Lisboa).  
 - **RUN_ON_START** -> se `true`, corre logo ao arrancar (útil no Railway para não esperar até à meia-noite).  
 - **AIRLABS_LIMIT** -> limite por pedido à API (máximo permitido pelo plano Airlabs).
 

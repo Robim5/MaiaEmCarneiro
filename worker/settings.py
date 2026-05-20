@@ -77,7 +77,7 @@ def load_settings() -> Settings:
 
     raw_schedule = os.getenv("SCHEDULE_TIMES", DEFAULT_SCHEDULE_TIMES)
     if not isinstance(raw_schedule, str):
-        raise RuntimeError("SCHEDULE_TIMES tem de ser texto (ex.: 12:00,23:50)")
+        raise RuntimeError("SCHEDULE_TIMES tem de ser texto (ex.: 06:00,18:00)")
 
     return Settings(
         supabase_url=required["SUPABASE_URL"].strip(),
